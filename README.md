@@ -37,7 +37,7 @@ Git is extremely powerful and versitile, to the point that you will find many di
 I can't really claim any authority on the methods I'm describing in this document, other than I've been using git for over a decade of coding professionally and in personal projects and have found them useful.
 Like any good tool with some amount of complexity, the best way to use it will usually be situational.
 
-In this section I'm going to describe seven git commands and how I use them to help me get work done faster.
+In this section I'm going to describe several git commands and how I use them to help me get work done faster and better.
 To follow along, clone the repository at https://github.com/ssj71/Git_From_A_Git_Exercises and open a terminal in that directory.
 As prerequisites, you'll need git of course, but also gitk and a merge tool like kdiff3.
 If you are not able to do that, then you probably aren't quite ready for this tutorial, and should focus more on basic git useage first.
@@ -154,7 +154,7 @@ git log
 ```
 
 There's our commit! Aww, cute.
-I use the log very often to remind myself what was going on in a branch or where I left it. You can run it on different branches without needing to switch over too.
+I use the log very often to remind myself what was going on in a branch or where I left it. You can run it on different branches without needing to switch over too. Try it on the branch called "ten"
 ```
 git log ten
 ```
@@ -212,14 +212,39 @@ git log teen_features
 Ugh. There's a bunch of stuff there.
 I don't even know what all that does.
 We just need 14.
-We could merge that branch into ours but it has all those other commits adding things that aren't yet working or complete.
+We could merge that branch into ours, but it has all those other commits adding things that maybe aren't yet working or complete.
 
 So we'll cherry-pick only the commit we do want.
 ```
-git cherry-pick 
+git cherry-pick 80280a
 ```
 
+You see we only need to provide the commit-ish, not the whole hash, and if two commits match git will tell us and we can give a few more characters.
+Now you can see in the log we have feature 14 added, and in the features file too.
+But won't that cause problems when you both merge to master?
+Well, yes it could, but we'll cover that more later.
 
+## git blame
+
+Ah, blame.
+What a great command.
+It's not JUST to identify who caused a bug (though it's very good at that).
+It also makes it easy to see when each line in a file was added.
+Take a look:
+```
+git blame features
+```
+
+It's useful to have your terminal open large for this one, though github's blame interface is arguably better than the command line.
+See TODO: URL as an example
+But blame tells you the commit, author and date for each line of code.
+With useful commit messages, it's like having very thoroughly commented code that you only see the comments when you want to.
+Nifty, oh?
+
+
+Even without good commit messages, `blame` can be really helpful as an overview for the history of a file.
+You can also run `git log features` for a list of the commits that changed that file, but I find seeing the lines of code associated to each commit gives me better insights.
+The log is still useful though because blame doesn't show code that was removed, but that revert is still there in the log.
 
 
 
