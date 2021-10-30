@@ -30,14 +30,14 @@ Most of this exercise is done through the command line, because that is the inte
 
 # The Power of History
 
-/"He who doesn't know history is destined to repeat it"/ --Some dead dude.
+*"He who doesn't know history is destined to repeat it"* --Some dead dude.
 
 Many of us use git routinely or as a requirement from our workplace but fail to appreciate the full power git provides.
 Git is extremely powerful and versitile, to the point that you will find many different tribal opinions about best practices and how to use git "correctly."
 I can't really claim any authority on the methods I'm describing in this document, other than I've been using git for over a decade of coding professionally and in personal projects and have found them useful.
 Like any good tool with some amount of complexity, the best way to use it will usually be situational.
 
-In this section I'm going to describe six git commands and how I use them to help me get work done faster.
+In this section I'm going to describe seven git commands and how I use them to help me get work done faster.
 To follow along, clone the repository at https://github.com/ssj71/Git_From_A_Git_Exercises and open a terminal in that directory.
 As prerequisites, you'll need git of course, but also gitk and a merge tool like kdiff3.
 If you are not able to do that, then you probably aren't quite ready for this tutorial, and should focus more on basic git useage first.
@@ -106,19 +106,18 @@ This command is useful to refresh your memory of what you've changed when you've
 
 The diff command can be used for more than just showing what is currently changed on the disk, you can use it to show an aggregated diff from multiple commits, different branches, even different copies of the repository.
 
-So hopefully we understand diffs and some more fudamentals of how git works, lets move forward. Before we come to the next command we want to "save" this state of the files in history as a commit. So let's just run
+So hopefully we understand diffs and some more fudamentals of how git works, lets move forward.
+Before we come to the next command we want to "save" this state of the files in history as a commit.
+We shouldn't work on the main branch of any project with multiple devs so we'll make a new branch called "work" and commit to it.
+So let's just run
 ```
+git checkout -b work
 git commit -a -m "my first commit (in this project)!"
 ```
 
-You'll see there that it outputs the number of changes and some other data that we'll discuss more later.
+You'll see there that the commit command outputs the number of changes and some other data that we'll discuss more later.
 
 Now that we've made a commit we're ready for the next command to discuss.
-
-
-
-
-
 
 
 ## git show
@@ -130,20 +129,95 @@ git show
 
 By default it shows the most recent commit.
 It looks a lot like the diff we had before commiting. 
-It *IS* the diff we had before commiting!
-Only now it has some meta data and is actually recorded as part of our history.o
+Wait a minute, it *IS* the diff we had before commiting!
+Only now it has some meta data and is actually recorded as part of our history.
 
 The meta data includes the commit hash, which is a long, unique hexadecimal number identifier for each commit.
 This hash is used in a lot of the commands we'll be using later, so it's useful to make a note what to look for.
 Usually you only need the first 6 or so numbers in the hash (sometimes referred to as a commit-ish).
-the author, date and commit message.
 
+The other data include the author, date, and a commit message which should describe what the diff is or does.
+There are other data that aren't displayed by the `show` command though there are ways to see them.
+One that we'll mention is the parent(s) of the commit.
+When I said that git history is basically just a list of diffs, that was a bit disengenuous because the history can be nonlinear.
+More on that later.
 
+The command `git show` has a lot of options but I don't use them (yet).
+So we're going to move on to the next command.
 
+## git log
 
+This simply squishes down the history to a linear list of commits and shows the hash, date author and commit message for each.
+Try it out.
+```
+git log
+```
 
+There's our commit! Aww, cute.
+I use the log very often to remind myself what was going on in a branch or where I left it. You can run it on different branches without needing to switch over too.
+```
+git log ten
+```
 
+There you see that I added feature 10 on that branch, but otherwise it's the same as the main.
+Sometimes if you are looking for something deeper in the history it can be nice to use `git log --oneline` for a more compact list with less info.
+But enough about `git log`.
+It's pretty straightforward.
 
+## git revert
+
+Revert is to undo a commit.
+It pretty much takes the diff, reverses the insertions and deletions and the applies that diff.
+As long as you haven't changed lines effected by the diff after the commit you are trying to revert it works cleanly.
+If you have changed lines then you'll have merge conflicts but we aren't ready to address those.
+
+First, why revert? Why not just make a new commit that undoes the changes that need to be done?
+Well, first, I'm lazy!
+It's much easier to just revert one than to track down every change in the editor and make sure I do it right.
+Next reason is because it has a different message in your history.
+It shows that you tried something and it didn't work, but you want to remember that you tried it.
+It helps indicate that you needed to undo it, rather than just hiding that fact in 
+
+Let's try it now.
+You worked hard on that feature 42 but management decided they don't want it.
+So just call
+```git revert```
+
+and it will make a new commit.
+You can use the message make a good comment about them that they'll (probably) never look at or just leave it at the boring default.
+Now look in the log and you see that your commit is still there and now there's a new revert commit.
+
+The `revert` command can be convenient but it only works when your commit only has exactly the diff you want to revert. If you added some comments, fixed a typo, ran your code beautifier on a couple files, AND did that bugfix that caused a regression all in the same commit, you either have to wholesale undo those changes, or you have to do it some other way than `git revert`.
+
+That may not seem like a huge cost.
+Reverting is pretty well in the category of "one way to do it."
+It might not be your style.
+That's ok, but I hope some of these other ideas will help you realize how important clean commits are.
+So lets go to the next command.
+
+## git cherry-pick
+
+This command takes a single commit and applies it to the current code, rather than the parent it had when the commit was made.
+This command is extremely useful when you have a bunch of commits and important changes in a branch that just isn't ready yet. Or someone else has a change you need on their branch and you don't want to wait for them to merge everything in.
+
+This is another case for having nice clean commits. The more independent you can make your commits, with one idea per commit the more useful this will be.
+
+Pretend that our next feature assignment is really dependent on feature 14.
+Another developer implemented that on the branch `teen_features`.
+So let's give it a look.
+```
+git log teen_features
+```
+
+Ugh. There's a bunch of stuff there.
+I don't even know what all that does.
+We just need 14.
+We could merge that branch into ours but it has all those other commits adding things that aren't yet working or complete.
+
+So we'll cherry-pick only the commit we do want.
+```
+git cherry-pick 
+```
 
 
 
@@ -164,3 +238,33 @@ the author, date and commit message.
     5. git cherry-pick
     6. git checkout -p
     7. Pre-Commit Hook
+
+    notes:
+    dev A writes 3 features, then got others to help with the project.
+    Dev B works on ten 10
+    Dev C works on the teen_features 13-19
+    Dev A continues on next_3 4-6
+    Dev B finishes, makes a PR and merges to main.
+    Dev A makes a PR and sees it has a conflict.
+    Dev A tells Dev C about the conflicts so C merges main into her WIP.
+    Dev A merges main into her branch and makes some changes to fix things.
+    Dev A gets the PR for features 3-6 merged
+    Dev B begins working on features 7-9, 11 and 12
+    Dev C merges master again into her branch.
+    Dev C finishes and merges her features into master
+    Dev B finishes and merges master in her branch, then merges into master branch
+
+    notes 2:
+    dev A writes 3 features, then got others to help with the project.
+    Dev B works on ten 10
+    Dev C works on the teen_features 13-19
+    Dev A continues on next_3 4-6
+    Dev B finishes, makes a PR and merges to main.
+    Dev A makes a PR and sees it has a conflict.
+    Dev A tells Dev C about the conflicts so C merges main into her WIP.
+    Dev A merges main into her branch and makes some changes to fix things.
+    Dev A gets the PR for features 3-6 merged
+    Dev B begins working on features 7-9, 11 and 12
+    Dev C merges master again into her branch.
+    Dev C finishes and merges her features into master
+    Dev B finishes and merges master in her branch, then merges into master branch
