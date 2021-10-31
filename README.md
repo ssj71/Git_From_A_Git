@@ -13,11 +13,12 @@ Most of this exercise is done through the command line, because that is the inte
 1. The Power of History
     1. git diff
     2. git show
-    3. git revert
-    4. git cherry-pick
-    5. git blame
-    6. git bisect
-    7. gitk
+    3. git log
+    4. git revert
+    5. git cherry-pick
+    6. git blame
+    7. git bisect
+    8. gitk
 2. How to Curate Your History
     1. git add -p
     4. git branch
@@ -40,6 +41,7 @@ Like any good tool with some amount of complexity, the best way to use it will u
 In this section I'm going to describe several git commands and how I use them to help me get work done faster and better.
 To follow along, clone the repository at https://github.com/ssj71/Git_From_A_Git_Exercises and open a terminal in that directory.
 As prerequisites, you'll need git of course, but also gitk and a merge tool like kdiff3.
+After you've cloned, make sure to run a `git fetch` because we'll use several different branches for these exercises.
 If you are not able to do that, then you probably aren't quite ready for this tutorial, and should focus more on basic git useage first.
 Or you could just google it and press forward.
 I'd probably do that but that doesn't mean it's a good idea.
@@ -142,6 +144,8 @@ One that we'll mention is the parent(s) of the commit.
 When I said that git history is basically just a list of diffs, that was a bit disengenuous because the history can be nonlinear.
 More on that later.
 
+Github's UI provides a link most any time you see a commit hash displayed and if you click the link you get a pretty page with basically a `git show` of that commit.
+E.G. https://github.com/ssj71/Git_From_A_Git_Exercises/commit/18a11877e68c595ff34a9549a6285dec71875934#diff-5b8a8b56dada6ce7567442b4935298df7de2badd7becdcf4915a59487338ca4b
 The command `git show` has a lot of options but I don't use them (yet).
 So we're going to move on to the next command.
 
@@ -161,6 +165,16 @@ git log ten
 
 There you see that I added feature 10 on that branch, but otherwise it's the same as the main.
 Sometimes if you are looking for something deeper in the history it can be nice to use `git log --oneline` for a more compact list with less info.
+
+Another great use for log is to look at the history of a specific file.
+```
+git log features
+```
+
+This example isn't great because it's the only file in the project, but in a real world project it's helpful to filter out all other commits and just look at when and why a particular file was changed.
+If you are looking at a file on Github you can click the history button to get the same results as git log on that file.
+E.G. https://github.com/ssj71/Git_From_A_Git_Exercises/commits/master/features
+Sometimes that's more convenient.
 But enough about `git log`.
 It's pretty straightforward.
 
@@ -235,27 +249,87 @@ Take a look:
 git blame features
 ```
 
-It's useful to have your terminal open large for this one, though github's blame interface is arguably better than the command line.
-See TODO: URL as an example
+It's useful to have your terminal open large for this one, though Github's blame interface is sometimes cleaner and sometimes more convenient.
+E.g. https://github.com/ssj71/Git_From_A_Git_Exercises/blame/master/features
 But blame tells you the commit, author and date for each line of code.
 With useful commit messages, it's like having very thoroughly commented code that you only see the comments when you want to.
 Nifty, oh?
 
 
 Even without good commit messages, `blame` can be really helpful as an overview for the history of a file.
-You can also run `git log features` for a list of the commits that changed that file, but I find seeing the lines of code associated to each commit gives me better insights.
-The log is still useful though because blame doesn't show code that was removed, but that revert is still there in the log.
+I often find a situation where I'll ask, why is this line of code here?
+`git blame`, oh it was added when we had to add that fix for the hardware bug (or whatever).
+You can also run `git log` for the file as mentioned earlier, but I find seeing the lines of code associated to each commit gives me more granular insight on how the file changed.
+The log is still useful though because blame doesn't show code that was removed, whereas the log does, such as our revert commit.
+It's just another tool that serves a bit different purpose.
+
+The catch with blame, is it only shows the most recent commit on a line.
+If you have great commit messages and small contained commits, but then your last commit is "run astyle" and 50% of lines changed, blame won't be very useful.
+
+## git bisect
+
+Bisect is a pretty cool command.
+It automates a binary search through history.
+It is awesome for chasing down a regression that you can't tell when it was introduced.
+You pretty much enter the last known good commit that didn't have the bug, and it checks out the middle commit between the current code (which has the bug) and the good commit you enter.
+You build and test and tell git whether it worked or not.
+Git then checks out another commit, and you test it again.
+Pretty quickly you can figure out what commit broke it.
+We won't do an example, but it's handy to know.
+
+The rub is your commits have to compile and be testable.
+When you try this and every single commit that gets checked out requires a bunch of touching up to run the test and check for the bug, it's nowhere near as convenient.
+Similary a very non-linear history can make this command less useful.
+
+## gitk
+
+This isn't a git command, but it's a very useful tool.
+It just visualizes the history as the various branches and helps you browse the commits there.
+Our current branch doesn't have a very interesting history so let's look at a different branch with gitk:
+```
+gitk messy_master
+```
+
+Now you should see the history of this branch.
+You can see here an example of a highly non-linear history; branches merging back and forth and all eventually feeding into this branch.
+We'll talk about this more later.
+
+For now, just note that gitk is handy when the log seems confusing because commits appear in a weird order or something.
+Honestly I used to use `gitk` heavily, but now I tend to just use `log` and `show` for most of my needs.
+For those who like GUI's it probably seems a bit more comfortable.
+Github also has a decent UI to show history this way, except it visualizes every branch on the remote.
+They call it the "network" and it can be accessed through the "insights" tab.
+E.g. https://github.com/ssj71/Git_From_A_Git_Exercises/network
+I look at this most any time I'm looking at a new repository and want to know what branch to use.
+You can see easily what branches are being worked on and which are stale.
+
+A nice linear history is always easier to digest than a highly nonlinear one.
 
 
 
+I hope you see a few new ways now that you can use your history more to your advantage.
+Even if you don't like the command line, a lot of these tools are available in a prettier fashion through Github's UI.
+Ultimately the point of history is to save time and help reduce mistakes.
+But many of these tools and tricks I've described had caveats about how they're only useful if you've done this or that with your history, and that is the hard part.
+That is why the second half of this tutorial is focused on methods that will help keep your history clean.
 
-    3. git revert
-    4. git cherry-pick
-    5. git blame
-    6. git bisect
-    7. gitk
-2. How to Curate Your History
-    1. git add -p
+# How to Curate Your History
+
+*"History is always written by the winners"* --some other dead person
+
+Ok, so we want to keep our history clean.
+Linear.
+With focused, single purpose commits.
+
+But the problem is that, man, I'm just so good, every time I open a file I find those bugs and I fix 'em dang it.
+Plus I always leave excellent comments to make the code better while I'm working on it.
+And sometimes thoese things don't fit into the feature that this branch was made to implement.
+
+
+## git add -p
+
+
+
     4. git branch
     7. git reset
     2. git rebase
