@@ -11,7 +11,7 @@ Most of this exercise is done through the command line, because that is the inte
 
 
 ## Table of Contents
-1. [(The Power of History)]
+1. The Power of History
     1. git diff
     2. git show
     3. git log
@@ -22,14 +22,14 @@ Most of this exercise is done through the command line, because that is the inte
     8. gitk
 2. How to Curate Your History
     1. git add -p
-    4. git branch
-    7. git reset
-    2. git rebase
-    3. git mergetool
-    5. git cherry-pick
-    6. git checkout -p
-    7. Pre-Commit Hook
+    2. git branch
+    3. git reset
+    4. git rebase
+    5. git checkout -p
+    6. Pre-Commit Hook
+    7. Conclusion
 
+(Note that on Github you can get a ToC with links using the button at the top left corner of this frame)
 
 
 # The Power of History
