@@ -9,8 +9,9 @@ I'll try to explain basic concepts as we come across them but this is not meant 
 
 Most of this exercise is done through the command line, because that is the interface I use the most. I started out using the Git GUI and it helped me get my feet wet, but it also simplified things in a way that soon became limiting. When I always had to turn to the terminal to fix the issues I'd created through the GUI I soon just dropped using the GUI and have just used the command line ever since. You may be using some other interface, a GUI or context menu one. These are fine and hopefully you can figure out how to do all of these commands, but I can't really help much.
 
+
 ## Table of Contents
-1. The Power of History
+1. [(The Power of History)]
     1. git diff
     2. git show
     3. git log
@@ -28,7 +29,6 @@ Most of this exercise is done through the command line, because that is the inte
     5. git cherry-pick
     6. git checkout -p
     7. Pre-Commit Hook
-
 
 
 
@@ -663,5 +663,73 @@ You can tell it to skip that commit with `git rebase --skip` when it brings it u
 
 So what can you do if you've already messed up and made a huge branch with tons of messy commits?
 Well, you can panic.
+But that won't help.
+
+A better action is to bring the changes into a new branch without using the history.
+Instead of cherry-picking commits into our new branch, we are picking hunks to apply to our new branch.
+The dialog is just like the one for `git add -p" so you are already an expert.
+
+Let's try it.
+First checkout the history of the branch
+```
+gitk missing_features
+```
+It's the spaghetti network we're trying to avoid.
+So instead of merging or rebasing, we're just going to abandon that branch and take the changes we need out of it.
+```
+git checkout -p missing_features
+```
+
+Now we can carefully select which diffs to add to our branch.
+And we can do them piece by piece to make many small, clean commits.
+Because in this case they are all consecutive lines we will have to manually edit the patches, but we know how to do that.
+We control our history.
 
 ## Pre-Commit Hook
+
+The final thing we can do to help make our history more useful is to avoid "astyle commits."
+These typically happen when a codebase has a style requirement and recommend you run your code through a beautifier program like astyle.
+Most often you focus on getting the code working, commit and push and then the automated PR checks on github tell you you failed the style test.
+I always fail style tests, I'm still in boot cut jeans from 2000.
+
+So then you run astyle and get a big fat commit touching many lines and commit with the message "ran astyle."
+So next time you try `git blame` to figure out when this suspicious line was added you see half the lines are from the astyle commit.
+You can work around this to find the deeper history of an individual line but it's just better if we can avoid that style commit in the first place.
+Truly it is a useless piece of history, by design it has no functional change to the code.
+It would have been much better to have styled the code *before* any commits are made.
+
+That sounds like a painful effort but fortunately most of us are using computers to work on the code and computers are amazing at automating things like this.
+Enter the git hook.
+
+Hooks are scripts that git runs before or after certain actions.
+You can automate something whenever you checkout a branch, whenever you push, or sundry other points in Git useage.
+The only one I really use is the pre-commit hook.
+
+The pre-commit hook runs before making a commit.
+The script runs automatically and can prevent the commit from happening if it fails.
+So in my script I have it run astyle, and if astyle changes anything, it fails, printing a message of the astyle command to run to fix it.
+You could make it automatically run astyle and re-add the file, but then it will add everything in the file, rather than the diffs you carefully picked using `git add -p`.
+This more manual method gives me a bit more control.
+
+It does take a little extra effort than just a blanket astyle commit, but I think a clean history is worth a little extra effort.
+You can also bypass the check but I rarely do.
+
+
+## Conclusion
+
+I've tried to convince you that a clean history is useful and worth spending some effort toward.
+You don't have to be perfect.
+I am not perfect myself.
+I still have commits of "forgot missing paren" or "now it does compile."
+Just try to take a few of these concepts that you think could be helpful and try them out until they become habits.
+You can use the other ideas later.
+Even small efforts toward clean history do pay off in making it maintainable and easier to work together in parallel and get more done faster.
+
+
+History can be very powerful.
+
+You can control history.
+
+You can be very powerful.
+
+Now go and make beatiful code.
