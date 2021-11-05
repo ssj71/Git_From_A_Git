@@ -44,7 +44,7 @@ Like any good tool with some amount of complexity, the best way to use it will u
 
 In this section I'm going to describe several git commands and how I use them to help me get work done faster and better.
 To follow along, clone the repository at https://github.com/ssj71/Git_From_A_Git_Exercises and open a terminal in that directory.
-As prerequisites, you'll need git of course, but also gitk and a merge tool like kdiff3.
+As prerequisites, you'll need git of course, but also gitk and a merge tool like kdiff3 (note that there are other tools that are perfectly substitutible and may work better on your platform, just any git history visualization tool, and 3 way merge tool).
 After you've cloned, make sure to run a `git fetch` because we'll use several different branches for these exercises.
 If you are not able to do that, then you probably aren't quite ready for this tutorial, and should focus more on basic git useage first.
 Or you could just google it and press forward.
@@ -209,12 +209,12 @@ inserting the hash of your previous commit and it will make a new commit.
 You can use the message make a good comment about them that they'll (probably) never look at or just leave it at the boring default.
 Now look in the log and you see that your commit is still there and now there's a new revert commit.
 
-The `revert` command can be convenient but it only works when your commit only has exactly the diff you want to revert. If you added some comments, fixed a typo, ran your code beautifier on a couple files, AND did that bugfix that caused a regression all in the same commit, you either have to wholesale undo those changes, or you have to do it some other way than `git revert`.
+The `revert` command can be convenient but it only works when your commit only has exactly the diff you want to revert. If you added some comments, fixed a typo, ran your code beautifier on a couple files, AND did that bugfix that caused a regression all in the same commit, you either have to wholesale undo all those changes, or you have to do it some other way than `git revert`.
 
 That may not seem like a huge cost.
 Reverting is pretty well in the category of "one way to do it."
 It might not be your style.
-That's ok, but I hope some of these other ideas will help you realize how important clean commits are.
+That's ok, but I hope some of these other ideas will help you realize how important it is to have clean commits that contain a complete "thought" (bug-fix, feature add, topic, etc.) without extraneous changes.
 So lets go to the next command.
 
 
